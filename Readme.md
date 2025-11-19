@@ -45,5 +45,6 @@ tinylink/
 ├── views/
 │   ├── dashboard.ejs     # Main dashboard page
 │   └── stats.ejs         # Link statistics page
+├── .env   
 ├── package.json          # Dependencies and scripts
 └── README.md             # This file
