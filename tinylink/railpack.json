@@ -1,0 +1,10 @@
+{
+  "root": "tinylink",
+  "build": {
+    "command": "cd tinylink && npm install",
+    "output": "tinylink/node_modules"
+  },
+  "start": {
+    "command": "cd tinylink && npm start"
+  }
+}
