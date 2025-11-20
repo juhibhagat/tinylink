@@ -12,19 +12,6 @@ npm run dev
 npm start
 
 
-# Deploy to Render.com
- 1. Create account at render.com
- 2. Connect GitHub repository
- 3. Create new Web Service
- 4. Configure settings:
-    - Build Command: npm install
-    - Start Command: npm start
- 5. Add Environment Variables:
-    - NODE_ENV=production
-    - BASE_URL=your-app-name.onrender.com
- 6. Deploy - Automatic deployment on git push
-
-
 
 # TinyLink - URL Shortener
 
