@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', require('./routes/web'));
-app.use('/api/healthz', require('./routes/api/healthz'));
+app.use('/healthz', require('./routes/api/healthz'));
 app.use('/api/links', require('./routes/api/links'));
 app.use('/', require('./routes/api/redirect'));
 
