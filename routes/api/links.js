@@ -1,5 +1,6 @@
 const express = require('express');
 const Link = require('../../models/Link');
+const { validateCreateLink, validateCodeParam } = require('../../middleware/validation');
 const router = express.Router();
 
 // GET /api/links - List all links
@@ -13,41 +14,41 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/links - Create new link
-router.post('/', async (req, res) => {
+router.post('/', validateCreateLink, async (req, res) => {
   try {
     const { originalUrl, code } = req.body;
 
-    if (!originalUrl) {
-      return res.status(400).json({ error: 'URL is required' });
-    }
-
-    // Validate URL
-    try {
-      new URL(originalUrl);
-    } catch (err) {
-      return res.status(400).json({ error: 'Invalid URL format' });
-    }
-
     // Generate code if not provided
     let shortCode = code;
-    if (!shortCode) {
-      shortCode = Math.random().toString(36).substring(2, 8);
+    if (!shortCode || shortCode.trim() === '') {
+      // Use model's random code generator
+      shortCode = Link.generateRandomCode(6);
+    } else {
+      shortCode = shortCode.trim();
     }
 
-    // Validate code format
-    if (!/^[A-Za-z0-9]{1,10}$/.test(shortCode)) {
-      return res.status(400).json({ error: 'Code can only contain letters and numbers (1-10 characters)' });
+    // Use model's validation
+    if (!Link.isValidCode(shortCode)) {
+      return res.status(400).json({ 
+        error: 'Code must be 6-8 characters and contain only letters and numbers' 
+      });
     }
 
-    // Check if code exists
+    if (!Link.isValidUrl(originalUrl)) {
+      return res.status(400).json({ 
+        error: 'Invalid URL format. Must start with http:// or https://' 
+      });
+    }
+
+    // Check if code exists using model method
     if (await Link.codeExists(shortCode)) {
       return res.status(409).json({ error: 'Code already exists' });
     }
 
-    // Create link
+    // Create link using model (which has its own validation)
     const link = await Link.create({
       code: shortCode,
-      originalUrl: originalUrl
+      originalUrl: originalUrl.trim()
     });
 
     const shortUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/${link.code}`;
@@ -58,12 +59,22 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
+    console.error('Create link error:', error);
+    
+    // Handle specific errors from model
+    if (error.message === 'Code already exists') {
+      return res.status(409).json({ error: error.message });
+    }
+    if (error.message.includes('must be') || error.message.includes('Invalid URL')) {
+      return res.status(400).json({ error: error.message });
+    }
+    
     res.status(500).json({ error: 'Failed to create link' });
   }
 });
 
 // GET /api/links/:code - Get link stats
-router.get('/:code', async (req, res) => {
+router.get('/:code', validateCodeParam, async (req, res) => {
   try {
     const { code } = req.params;
     const link = await Link.findByCode(code);
@@ -79,18 +90,18 @@ router.get('/:code', async (req, res) => {
 });
 
 // DELETE /api/links/:code - Delete link
-router.delete('/:code', async (req, res) => {
+router.delete('/:code', validateCodeParam, async (req, res) => {
   try {
     const { code } = req.params;
-    const link = await Link.findByCode(code);
-
-    if (!link) {
-      return res.status(404).json({ error: 'Link not found' });
-    }
-
+    
+    // Delete using model (which handles not found case)
     await Link.delete(code);
+    
     res.json({ message: 'Link deleted successfully' });
   } catch (error) {
+    if (error.message === 'Link not found') {
+      return res.status(404).json({ error: error.message });
+    }
     res.status(500).json({ error: 'Failed to delete link' });
   }
 });

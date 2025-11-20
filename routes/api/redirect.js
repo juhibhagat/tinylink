@@ -1,9 +1,10 @@
 const express = require('express');
 const Link = require('../../models/Link');
+const { validateCodeParam } = require('../../middleware/validation');
 const router = express.Router();
 
 // GET /:code - Redirect to original URL
-router.get('/:code', async (req, res) => {
+router.get('/:code', validateCodeParam, async (req, res) => {
   try {
     const { code } = req.params;
     const link = await Link.findByCode(code);
