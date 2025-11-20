@@ -26,25 +26,52 @@ npm start
 
 
 
-# Deploy to Railway.app 
- 1. Sign up at railway.app
- 2. New Project → "Deploy from GitHub"
- 3. Connect your repository
- 4. Auto-deploys on every git push
- 5. Add environment variables in dashboard
+# TinyLink - URL Shortener
+
+A simple and efficient URL shortener service built with Node.js, Express, and PostgreSQL.
+
+## Features
+
+- **Shorten URLs** - Convert long URLs into short, shareable links
+- **Custom Codes** - Use custom short codes for memorable URLs
+- **Click Tracking** - Monitor total clicks and last accessed time
+- **Link Management** - View, track, and delete your shortened links
+- **Responsive UI** - Clean interface that works on all devices
+
+## Tech Stack
+
+- **Backend:** Node.js, Express.js
+- **Database:** PostgreSQL (Neon.tech)
+- **Frontend:** HTML, Tailwind CSS, JavaScript
+- **Hosting:** Render/Railway (Backend), Neon (Database)
+
 
 
 
 # Project Structure
 tinylink/
-├── app.js                 # Main server file
+├── server.js                     # Main server file
 ├── config/
-│   └── db.js             # Database configuration
+│ └── database.js                  # Database configuration
 ├── routes/
-│   └── links.js          # All application routes
+│ ├── api/
+│ │ ├── healthz.js                 # Health check endpoint
+│ │ └── links.js                   # Link management APIs
+│ └── web.js                       # Web page routes
+├── models/
+│ └── Link.js                      # Database model for links
+├── middleware/
+│ └── validation.js                # Request validation
 ├── views/
-│   ├── dashboard.ejs     # Main dashboard page
-│   └── stats.ejs         # Link statistics page
-├── .env   
-├── package.json          # Dependencies and scripts
-└── README.md             # This file
+│ ├── dashboard.html               # Main dashboard page
+│ ├── stats.html                   # Link statistics page
+│ └── 404.html                     # 404 error page
+├── public/
+│ ├── css/
+│ │ └── output.css                 # Tailwind CSS
+│ └── js/
+│ ├── script.js                    # Dashboard JavaScript
+│ └── stats.js                     # Stats page JavaScript
+├── .env.example                   # Environment variables template
+├── package.json                   # Dependencies and scripts
+└── README.md                      # Project documentation
